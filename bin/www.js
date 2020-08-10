@@ -57,7 +57,7 @@ http.createServer((req, res) => {
                         datafile[`${totalfiles[i]}`] = data
                     }
                     console.log(datafile)
-                    res.end(JSON.stringify(datafile))
+                    res.end(JSON.stringify({status:true,data:datafile}))
                 }
                 }
             })
