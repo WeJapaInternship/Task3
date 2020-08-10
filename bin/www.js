@@ -39,7 +39,7 @@ http.createServer((req, res) => {
         });
     }
     else if(req.method=="GET"){
-        console.log("get request made")
+        // console.log("get request made")
         fs.readdir(filebasepath,function(err, files) {
             if (err) {
                 res.end (JSON.stringify({success:false,status:false,message:"no such directory"}))
@@ -66,7 +66,8 @@ http.createServer((req, res) => {
     }
     else if(req.method == "DELETE"){
         var queryData = url.parse(req.url, true).query;
-        if(queryData.name){
+        if(queryData.nameid){
+            console.log("delete operation",queryData.nameid)
             fs.readdir(filebasepath,function(err, files) {
                 if (err) {
                     res.end (JSON.stringify({success:false,status:false,message:"no such directory"}))
@@ -75,13 +76,13 @@ http.createServer((req, res) => {
                         res.end(JSON.stringify({success:true,status:false,message:"folder is empty"}))
                     }
                     else{
-                        let filepath = filebasepath+"/"+queryData.name+".txt"
+                        let filepath = filebasepath+"/"+queryData.nameid+".txt"
+                        console.log(filepath)
                         fs.unlink(filepath,err=>{
                             if (err) throw new Error("error deleting file")
 
                         });
                         res.end(JSON.stringify({success:true,message:"file has been successfully deleted!!"}))
-
                     }
                  }
              })
@@ -92,14 +93,15 @@ http.createServer((req, res) => {
     }
     else if (req.method =="PUT"){
         var queryData = url.parse(req.url, true).query;
-        if(queryData.name && queryData.word){
-            console.log(queryData.name,queryData.word)
+        if(queryData.nameid && queryData.word){
+            console.log("put request made")
             
-            let filepath = filebasepath+"/"+queryData.name+".txt"
+            let filepath = filebasepath+"/"+queryData.nameid+".txt"
             // console.log(filepath)
             if(fs.existsSync(filepath)){
                 fs.appendFileSync(filepath,queryData.word,(err)=>{
                     if (err) throw new Error("error appending to file "+err)
+                    
                 })
                 res.end(JSON.stringify({success:true,message:"update successful"}))
             }else{
