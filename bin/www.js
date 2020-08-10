@@ -50,14 +50,16 @@ http.createServer((req, res) => {
                 }
                 else{
                     let totalfiles = files
-                
+                let counter=0;
 
                     for (let i=0;i<totalfiles.length;i++){
                         let data= fs.readFileSync(filebasepath+"/"+totalfiles[i], {encoding:'utf8', flag:'r'})
-                        datafile[`${totalfiles[i]}`] = data
+                        counter++;
+                        datafile[`${totalfiles[i].substring(0,totalfiles[i].length - 4)}`] = data
                     }
-                    console.log(datafile)
-                    res.end(JSON.stringify({status:true,data:datafile}))
+                
+                    // console.log(datafile)
+                    res.end(JSON.stringify({status:true,count:counter,data:datafile}))
                 }
                 }
             })
@@ -92,21 +94,19 @@ http.createServer((req, res) => {
         var queryData = url.parse(req.url, true).query;
         if(queryData.name && queryData.word){
             console.log(queryData.name,queryData.word)
-            fs.readdir(filebasepath,function(err, files) {
-                if (err) {
-                    res.end (JSON.stringify({success:false,status:false,message:"no such directory"}))
-                } 
-                else 
-                {
-                    let filepath = filebasepath+"/"+queryData.name+".txt"
-                    if(fs.existsSync(filepath)){
-                        fs.appendFileSync(filepath,queryData.word,(err)=>{
-                            if (err) throw new Error("error appending to file "+err)
-                        })
-                        res.end(JSON.stringify({success:true,message:"update successful"}))
-                    }
-                }
-            })
+            
+            let filepath = filebasepath+"/"+queryData.name+".txt"
+            // console.log(filepath)
+            if(fs.existsSync(filepath)){
+                fs.appendFileSync(filepath,queryData.word,(err)=>{
+                    if (err) throw new Error("error appending to file "+err)
+                })
+                res.end(JSON.stringify({success:true,message:"update successful"}))
+            }else{
+                res.end(JSON.stringify({success:false,status:false,message:"file does not exist"}))
+
+            }
+                
         }
         else{
             res.end(JSON.stringify({success:false,status:false,message:"parameters are missing"}))
