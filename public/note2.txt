@@ -1,1 +1,2 @@
 this is the beginning journey of nodejs
+yeah, i finally going used to pure nodejs
