@@ -25,16 +25,16 @@ http.createServer((req, res) => {
             let word = parse(body).word +os.EOL;
             // let buffer = new Buffer(word);
             let filepath = filebasepath+"/"+filename+".txt"
-            console.log(filepath,word)
-            fs.readdir(filebasepath,function(err, files) {
-                if(err){
+            // console.log(filepath,word)
+            fs.readdir(filebasepath,(errs,files)=>{
+                if(errs){
                     fs.mkdir(filebasepath,function(err){
                         if(!err){
                             if(fs.existsSync(filepath)){
                                 res.end(JSON.stringify({success:false,status:false,message:"file already exist"}))
                             }
                             else{
-                                fs.writeFileSync(filepath,word,(err)=>{
+                                fs.writeFile(filepath,word,(err)=>{
                                     if (err) throw new Error("error writing file "+err)
                                 })
                                 res.end(JSON.stringify({success:true,status:false,message:"note successfully created!!"}))
@@ -42,9 +42,13 @@ http.createServer((req, res) => {
                         }
                     })
                 }
-                
-            })
-            
+                else{
+                    fs.writeFile(filepath,word,(err)=>{
+                        if (err) throw new Error("error writing file "+err)
+                    })
+                    res.end(JSON.stringify({success:true,status:false,message:"note successfully created!!"}))
+                }
+            })    
         });
     }
     else if(parsedUrl.pathname === '/get' && req.method=="GET"){
@@ -68,7 +72,7 @@ http.createServer((req, res) => {
                         datafile[`${totalfiles[i].substring(0,totalfiles[i].length - 4)}`] = data
                     }
                 
-                    console.log(datafile)
+                    // console.log(datafile)
                     res.end(JSON.stringify({status:true,count:counter,data:datafile}))
                 }
                 }
