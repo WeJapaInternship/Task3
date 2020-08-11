@@ -26,16 +26,24 @@ http.createServer((req, res) => {
             // let buffer = new Buffer(word);
             let filepath = filebasepath+"/"+filename+".txt"
             console.log(filepath,word)
-            if(fs.existsSync(filepath)){
-                res.end(JSON.stringify({success:false,status:false,message:"file already exist"}))
-            }
-            else{
-                fs.writeFileSync(filepath,word,(err)=>{
-                    if (err) throw new Error("error writing file "+err)
-                })
-                res.end(JSON.stringify({success:true,status:false,message:"note successfully created!!"}))
-            }
-            
+            fs.readdir(filebasepath,function(err, files) {
+                if(err){
+                    fs.mkdir(filebasepath,function(err){
+                        if(!err){
+                            if(fs.existsSync(filepath)){
+                                res.end(JSON.stringify({success:false,status:false,message:"file already exist"}))
+                            }
+                            else{
+                                fs.writeFileSync(filepath,word,(err)=>{
+                                    if (err) throw new Error("error writing file "+err)
+                                })
+                                res.end(JSON.stringify({success:true,status:false,message:"note successfully created!!"}))
+                            }
+                        }
+                    })
+                }
+                
+            })
             
         });
     }
