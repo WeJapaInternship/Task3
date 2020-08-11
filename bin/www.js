@@ -13,7 +13,8 @@ let port  = process.env.PORT || '3030';
 let filebasepath = "public"
 let datafile={}
 http.createServer((req, res) => {
-    if (req.method === 'POST') {
+    const parsedUrl =url.parse(req.url, true);
+    if (parsedUrl.pathname === '/add' && req.method=="POST") {
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString(); // convert Buffer to string
@@ -38,7 +39,7 @@ http.createServer((req, res) => {
             
         });
     }
-    else if(req.method=="GET"){
+    else if(parsedUrl.pathname === '/get' && req.method=="GET"){
         // console.log("get request made")
         fs.readdir(filebasepath,function(err, files) {
             if (err) {
@@ -64,7 +65,7 @@ http.createServer((req, res) => {
                 }
             })
     }
-    else if(req.method == "DELETE"){
+    else if(parsedUrl.pathname === '/delete' && req.method=="GET"){
         var queryData = url.parse(req.url, true).query;
         if(queryData.nameid){
             console.log("delete operation",queryData.nameid)
@@ -91,7 +92,7 @@ http.createServer((req, res) => {
             res.end(JSON.stringify({success:false,status:false,message:"parameter is missing"}))
         }
     }
-    else if (req.method =="PUT"){
+    else if (parsedUrl.pathname === '/update' && req.method=="POST"){
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString(); // convert Buffer to string
@@ -104,7 +105,7 @@ http.createServer((req, res) => {
             let filepath = filebasepath+"/"+filename+".txt"
             console.log(filepath)
             if(fs.existsSync(filepath)){
-                fs.appendFileSync(filepath,word,(err)=>{
+                fs.writeFileSync(filepath,word,(err)=>{
                     if (err) throw new Error("error appending to file "+err)
                     
                 })
@@ -114,6 +115,9 @@ http.createServer((req, res) => {
 
             }
         })
+    }
+    else{
+        res.end(JSON.stringify({success:false,message:"invalid route"}))
     }
     
   }).listen(port, () => console.log("Server running at port "+port));
