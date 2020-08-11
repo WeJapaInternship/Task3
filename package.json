@@ -2,7 +2,7 @@
     "name": "Adewale_Adeleye",
     "main": "node start ./bin/www",
     "scripts": {
-        "start": "nodemon ./bin/www"
+        "start": "node ./bin/www"
     },
     "dependencies": {
         "axios": "^0.19.2",
