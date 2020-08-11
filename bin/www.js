@@ -47,6 +47,7 @@ http.createServer((req, res) => {
             } 
             else {
                 if (!files.length) {
+                    
                     res.end(JSON.stringify({success:true,status:false,message:"folder is empty"}))
                 }
                 else{
@@ -59,7 +60,7 @@ http.createServer((req, res) => {
                         datafile[`${totalfiles[i].substring(0,totalfiles[i].length - 4)}`] = data
                     }
                 
-                    // console.log(datafile)
+                    console.log(datafile)
                     res.end(JSON.stringify({status:true,count:counter,data:datafile}))
                 }
                 }
@@ -68,7 +69,7 @@ http.createServer((req, res) => {
     else if(parsedUrl.pathname === '/delete' && req.method=="GET"){
         var queryData = url.parse(req.url, true).query;
         if(queryData.nameid){
-            console.log("delete operation",queryData.nameid)
+            // console.log("delete operation",queryData.nameid)
             fs.readdir(filebasepath,function(err, files) {
                 if (err) {
                     res.end (JSON.stringify({success:false,status:false,message:"no such directory"}))
@@ -78,11 +79,20 @@ http.createServer((req, res) => {
                     }
                     else{
                         let filepath = filebasepath+"/"+queryData.nameid+".txt"
-                        console.log(filepath)
+                        // console.log(filepath)
                         fs.unlink(filepath,err=>{
-                            if (err) throw new Error("error deleting file")
+                            if (err)  res.end(JSON.stringify({success:false,message:"Error deleting file"}))
+
+                            res.end(JSON.stringify({success:true,message:"file has been successfully deleted!!"}))
 
                         });
+                        fs.readdir(filebasepath,function(err, files) {
+                            if (!files.length){
+                                fs.rmdir(filebasepath,error=>{
+                                    if (error) res.end(JSON.stringify({success: false,message:"can't delete directory"}))
+                                })
+                            }
+                        })
                         res.end(JSON.stringify({success:true,message:"file has been successfully deleted!!"}))
                     }
                  }
