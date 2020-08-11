@@ -92,14 +92,19 @@ http.createServer((req, res) => {
         }
     }
     else if (req.method =="PUT"){
-        var queryData = url.parse(req.url, true).query;
-        if(queryData.nameid && queryData.word){
-            console.log("put request made")
-            
-            let filepath = filebasepath+"/"+queryData.nameid+".txt"
-            // console.log(filepath)
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString(); // convert Buffer to string
+        });
+
+        req.on('end', () => {
+            let filename = parse(body).nameid;
+            let word = parse(body).word +os.EOL;
+
+            let filepath = filebasepath+"/"+filename+".txt"
+            console.log(filepath)
             if(fs.existsSync(filepath)){
-                fs.appendFileSync(filepath,queryData.word,(err)=>{
+                fs.appendFileSync(filepath,word,(err)=>{
                     if (err) throw new Error("error appending to file "+err)
                     
                 })
@@ -108,12 +113,7 @@ http.createServer((req, res) => {
                 res.end(JSON.stringify({success:false,status:false,message:"file does not exist"}))
 
             }
-                
-        }
-        else{
-            res.end(JSON.stringify({success:false,status:false,message:"parameters are missing"}))
-        }
-
+        })
     }
     
   }).listen(port, () => console.log("Server running at port "+port));
